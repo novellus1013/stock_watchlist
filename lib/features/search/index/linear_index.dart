@@ -1,4 +1,5 @@
-import '../../market/model/stock.dart';
+import 'package:stock_watchlist/features/market/model/stock.dart';
+
 import 'normalize.dart';
 import 'search_index.dart';
 

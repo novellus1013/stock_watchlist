@@ -1,5 +1,6 @@
-import '../../market/model/quote.dart';
-import '../../market/model/stock.dart';
+import 'package:stock_watchlist/features/market/model/quote.dart';
+import 'package:stock_watchlist/features/market/model/stock.dart';
+
 import 'normalize.dart';
 
 /// 완전일치 0 · 접두사 1 · 부분일치 2.
