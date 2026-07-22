@@ -28,23 +28,3 @@ abstract class Quote with _$Quote {
   bool get isUp => change > 0;
   bool get isDown => change < 0;
 }
-
-@freezed
-sealed class QuoteState with _$QuoteState {
-  // union은 sealed
-  const factory QuoteState.available(Quote quote) = QuoteAvailable;
-  const factory QuoteState.unavailable(
-    UnavailableReason reason, {
-    String? nearestTradingDay,
-  }) = QuoteUnavailable;
-}
-
-enum UnavailableReason {
-  nonTradingDay('해당 일자는 거래일이 아닙니다'),
-  beforeListing('상장 이전 기간입니다'),
-  delisted('상장폐지 또는 거래정지'),
-  unknown('해당 일자 데이터 없음');
-
-  const UnavailableReason(this.label);
-  final String label;
-}
