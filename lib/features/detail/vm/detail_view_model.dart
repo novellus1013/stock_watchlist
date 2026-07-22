@@ -62,7 +62,16 @@ class DetailViewModel extends _$DetailViewModel {
       return const QuoteState.unavailable(UnavailableReason.unverifiable);
     }
 
-    // ④ 거래일이고 상장 중인데 행이 없다 (6-2에서 '상장 이전'을 갈라낸다)
-    return const QuoteState.unavailable(UnavailableReason.unknown);
+    // ④ 거래일이고 지금 상장 중인데 그 날 행이 없다 → 상장 전인지 확인
+    try {
+      final had = await ref
+          .read(marketRepositoryProvider)
+          .hasDataInPastYear(code, date);
+      return QuoteState.unavailable(
+        had ? UnavailableReason.unknown : UnavailableReason.beforeListing,
+      );
+    } catch (_) {
+      return const QuoteState.unavailable(UnavailableReason.unknown);
+    }
   }
 }
