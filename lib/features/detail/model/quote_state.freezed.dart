@@ -119,11 +119,11 @@ return unavailable(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Quote quote)?  available,TResult Function( UnavailableReason reason,  String? nearestTradingDay)?  unavailable,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Quote quote)?  available,TResult Function( UnavailableReason reason,  String? latestTradingDay)?  unavailable,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case QuoteAvailable() when available != null:
 return available(_that.quote);case QuoteUnavailable() when unavailable != null:
-return unavailable(_that.reason,_that.nearestTradingDay);case _:
+return unavailable(_that.reason,_that.latestTradingDay);case _:
   return orElse();
 
 }
@@ -141,11 +141,11 @@ return unavailable(_that.reason,_that.nearestTradingDay);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Quote quote)  available,required TResult Function( UnavailableReason reason,  String? nearestTradingDay)  unavailable,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Quote quote)  available,required TResult Function( UnavailableReason reason,  String? latestTradingDay)  unavailable,}) {final _that = this;
 switch (_that) {
 case QuoteAvailable():
 return available(_that.quote);case QuoteUnavailable():
-return unavailable(_that.reason,_that.nearestTradingDay);}
+return unavailable(_that.reason,_that.latestTradingDay);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -159,11 +159,11 @@ return unavailable(_that.reason,_that.nearestTradingDay);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Quote quote)?  available,TResult? Function( UnavailableReason reason,  String? nearestTradingDay)?  unavailable,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Quote quote)?  available,TResult? Function( UnavailableReason reason,  String? latestTradingDay)?  unavailable,}) {final _that = this;
 switch (_that) {
 case QuoteAvailable() when available != null:
 return available(_that.quote);case QuoteUnavailable() when unavailable != null:
-return unavailable(_that.reason,_that.nearestTradingDay);case _:
+return unavailable(_that.reason,_that.latestTradingDay);case _:
   return null;
 
 }
@@ -250,11 +250,11 @@ $QuoteCopyWith<$Res> get quote {
 
 
 class QuoteUnavailable implements QuoteState {
-  const QuoteUnavailable(this.reason, {this.nearestTradingDay});
+  const QuoteUnavailable(this.reason, {this.latestTradingDay});
   
 
  final  UnavailableReason reason;
- final  String? nearestTradingDay;
+ final  String? latestTradingDay;
 
 /// Create a copy of QuoteState
 /// with the given fields replaced by the non-null parameter values.
@@ -266,16 +266,16 @@ $QuoteUnavailableCopyWith<QuoteUnavailable> get copyWith => _$QuoteUnavailableCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuoteUnavailable&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.nearestTradingDay, nearestTradingDay) || other.nearestTradingDay == nearestTradingDay));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QuoteUnavailable&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.latestTradingDay, latestTradingDay) || other.latestTradingDay == latestTradingDay));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,reason,nearestTradingDay);
+int get hashCode => Object.hash(runtimeType,reason,latestTradingDay);
 
 @override
 String toString() {
-  return 'QuoteState.unavailable(reason: $reason, nearestTradingDay: $nearestTradingDay)';
+  return 'QuoteState.unavailable(reason: $reason, latestTradingDay: $latestTradingDay)';
 }
 
 
@@ -286,7 +286,7 @@ abstract mixin class $QuoteUnavailableCopyWith<$Res> implements $QuoteStateCopyW
   factory $QuoteUnavailableCopyWith(QuoteUnavailable value, $Res Function(QuoteUnavailable) _then) = _$QuoteUnavailableCopyWithImpl;
 @useResult
 $Res call({
- UnavailableReason reason, String? nearestTradingDay
+ UnavailableReason reason, String? latestTradingDay
 });
 
 
@@ -303,10 +303,10 @@ class _$QuoteUnavailableCopyWithImpl<$Res>
 
 /// Create a copy of QuoteState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? reason = null,Object? nearestTradingDay = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? reason = null,Object? latestTradingDay = freezed,}) {
   return _then(QuoteUnavailable(
 null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
-as UnavailableReason,nearestTradingDay: freezed == nearestTradingDay ? _self.nearestTradingDay : nearestTradingDay // ignore: cast_nullable_to_non_nullable
+as UnavailableReason,latestTradingDay: freezed == latestTradingDay ? _self.latestTradingDay : latestTradingDay // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

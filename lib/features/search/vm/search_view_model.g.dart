@@ -104,7 +104,7 @@ final class SearchIndexProvider
   }
 }
 
-String _$searchIndexHash() => r'55e59ace5d1bbf116ea52168b048b3dffd32993f';
+String _$searchIndexHash() => r'93aa9410e93896b6cf4a2f53e8d90c503bc7f889';
 
 @ProviderFor(searchResults)
 const searchResultsProvider = SearchResultsProvider._();
