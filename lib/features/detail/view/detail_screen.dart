@@ -9,6 +9,8 @@ import 'package:stock_watchlist/features/market/model/quote.dart';
 import 'package:stock_watchlist/features/market/provider/market_providers.dart';
 import 'package:stock_watchlist/features/market/repo/market_repository_impl.dart';
 
+final _dateFormat = DateFormat('yyyy-MM-dd');
+
 class DetailScreen extends ConsumerWidget {
   const DetailScreen({super.key, required this.code, required this.name});
 
@@ -19,24 +21,86 @@ class DetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(detailViewModelProvider(code));
     final value = state.value;
+
+    // 날짜 피커의 상한. 아직 날짜를 안 골랐을 때 보여줄 날짜
     final latest = ref.watch(calendarProvider).value?.latest;
+    final fallback = latest == null
+        ? DateTime.now()
+        : MarketRepositoryImpl.parse(latest);
+    final shown = ref.watch(selectedDateProvider(code)) ?? fallback;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: Text(code, style: Theme.of(context).textTheme.bodySmall),
+          preferredSize: const Size.fromHeight(16),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(code, style: Theme.of(context).textTheme.bodySmall),
+          ),
         ),
       ),
       body: Column(
         children: [
-          _DateBar(code: code, latest: latest),
-          // 재조회 중이어도 화면은 그대로 두고 위에 2px 바만
+          // 날짜 바
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                const SizedBox(width: 8),
+                Text(_dateFormat.format(shown)),
+                const Spacer(),
+                TextButton(
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: shown,
+                      firstDate: DateTime(2020),
+                      lastDate: fallback,
+                    );
+                    if (picked != null) {
+                      ref
+                          .read(selectedDateProvider(code).notifier)
+                          .change(picked);
+                    }
+                  },
+                  child: const Text('날짜 변경'),
+                ),
+              ],
+            ),
+          ),
+
           SizedBox(
             height: 2,
             child: state.isLoading ? const LinearProgressIndicator() : null,
           ),
+
+          // 이전 값이 남은 채 재조회가 실패하면 에러 화면이 안 뜸
+          if (state.hasError && value != null)
+            Container(
+              width: double.infinity,
+              color: Colors.orange.shade100,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber, size: 16),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      '새 날짜를 불러오지 못했습니다. 이전 조회 결과입니다.',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () =>
+                        ref.invalidate(detailViewModelProvider(code)),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
+              ),
+            ),
+
           Expanded(
             child: switch ((value, state.isLoading)) {
               (null, true) => const Center(child: CircularProgressIndicator()),
@@ -49,46 +113,6 @@ class DetailScreen extends ConsumerWidget {
                 QuoteUnavailable(:final reason) => _Unavailable(reason: reason),
               },
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DateBar extends ConsumerWidget {
-  const _DateBar({required this.code, this.latest});
-
-  final String code;
-  final String? latest;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final vm = ref.read(detailViewModelProvider(code).notifier);
-    final fallback = latest == null
-        ? DateTime.now()
-        : MarketRepositoryImpl.parse(latest!);
-    final shown = vm.dateOr(fallback);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-      child: Row(
-        children: [
-          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-          const SizedBox(width: 8),
-          Text(DateFormat('yyyy-MM-dd').format(shown)),
-          const Spacer(),
-          TextButton(
-            onPressed: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: shown,
-                firstDate: DateTime(2020),
-                lastDate: fallback,
-              );
-              if (picked != null) vm.changeDate(picked);
-            },
-            child: const Text('날짜 변경'),
           ),
         ],
       ),
@@ -153,15 +177,31 @@ class _Unavailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.event_busy, size: 48, color: Colors.grey),
-        const SizedBox(height: 12),
-        Text(reason.label),
-      ],
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.event_busy, size: 48, color: Colors.grey),
+          const SizedBox(height: 12),
+          Text(reason.label, style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 4),
+          Text(
+            _hint(reason),
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     ),
   );
+
+  String _hint(UnavailableReason r) => switch (r) {
+    UnavailableReason.nonTradingDay => '다른 날짜를 선택해 보세요.',
+    UnavailableReason.beforeListing => '상장일 이후 날짜를 선택해 보세요.',
+    UnavailableReason.delisted => '최근 거래일에 이 종목의 시세가 없습니다.',
+    UnavailableReason.unknown => '다른 날짜를 선택해 보세요.',
+  };
 }
 
 class _Error extends StatelessWidget {
