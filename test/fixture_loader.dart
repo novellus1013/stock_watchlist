@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:stock_watchlist/features/market/model/quote.dart';
 import 'package:stock_watchlist/features/market/model/stock.dart';
 
 const kFullSnapshot = 'test/fixtures/stocks_full_20260721.json';
@@ -13,3 +14,7 @@ List<Map<String, dynamic>> loadRows([String path = kFullSnapshot]) {
 
 List<Stock> loadStocks([String path = kFullSnapshot]) =>
     loadRows(path).map(Stock.fromRow).toList();
+
+Map<String, Quote> loadQuotes([String path = kFullSnapshot]) => {
+  for (final r in loadRows(path)) r['srtnCd'] as String: Quote.fromRow(r),
+};
