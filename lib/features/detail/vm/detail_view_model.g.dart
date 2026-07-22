@@ -50,7 +50,7 @@ final class DetailViewModelProvider
   }
 }
 
-String _$detailViewModelHash() => r'f9546ee7202541ad57ea7fe26d2365ae1a0b979b';
+String _$detailViewModelHash() => r'd47853dd28fa7c226c3aeca293a3cf9fcfecca15';
 
 final class DetailViewModelFamily extends $Family
     with
