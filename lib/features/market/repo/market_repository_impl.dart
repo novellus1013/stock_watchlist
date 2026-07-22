@@ -6,19 +6,13 @@ import 'package:stock_watchlist/features/market/model/quote.dart';
 import 'package:stock_watchlist/features/market/model/stock.dart';
 import 'package:stock_watchlist/features/market/model/trading_calendar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:stock_watchlist/features/market/repo/market_repository.dart';
 
 part 'market_repository_impl.g.dart';
 
 @Riverpod(keepAlive: true)
 MarketRepository marketRepository(Ref ref) =>
     MarketRepositoryImpl(StockService(ref.watch(dioProvider)));
-
-abstract interface class MarketRepository {
-  Future<TradingCalendar> fetchCalendar();
-  Future<MarketSnapshot> fetchSnapshot(String date);
-  Future<Quote?> fetchQuote(String code, String date);
-  Future<bool> hasDataInPastYear(String code, String date);
-}
 
 class MarketRepositoryImpl implements MarketRepository {
   MarketRepositoryImpl(this._service);
