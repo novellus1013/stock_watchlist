@@ -6,6 +6,7 @@ import 'package:stock_watchlist/features/market/model/stock.dart';
 import 'package:stock_watchlist/features/market/provider/market_providers.dart';
 import 'package:stock_watchlist/features/search/view/stock_tile.dart';
 import 'package:stock_watchlist/features/search/vm/search_view_model.dart';
+import 'package:stock_watchlist/features/watchlist/view/watchlist_screen.dart';
 
 class SearchScreen extends ConsumerWidget {
   const SearchScreen({super.key});
@@ -19,7 +20,18 @@ class SearchScreen extends ConsumerWidget {
 
     if (snap == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('종목 검색')),
+        appBar: AppBar(
+          title: Text('${snap?.date} · ${snap?.stocks.length}종목'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.star),
+              tooltip: '관심종목',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WatchlistScreen()),
+              ),
+            ),
+          ],
+        ),
         body: snapState.isLoading
             ? const Center(child: CircularProgressIndicator())
             : _SnapshotError(error: snapState.error),
