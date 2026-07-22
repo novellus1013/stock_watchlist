@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stock_watchlist/features/detail/view/detail_screen.dart';
+import 'package:stock_watchlist/features/detail/view/quote_label.dart';
 import 'package:stock_watchlist/features/market/model/market_snapshot.dart';
-import 'package:stock_watchlist/features/market/model/quote.dart';
 import 'package:stock_watchlist/features/market/provider/market_providers.dart';
 import 'package:stock_watchlist/features/watchlist/model/watchlist_entry.dart';
 import 'package:stock_watchlist/features/watchlist/vm/watchlist_view_model.dart';
@@ -66,7 +67,7 @@ class _WatchlistTile extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (quote != null) _QuoteText(quote: quote),
+          if (quote != null) QuoteLabel(quote: quote),
           IconButton(
             icon: const Icon(Icons.star, color: Colors.amber),
             tooltip: '관심종목에서 삭제',
@@ -76,32 +77,13 @@ class _WatchlistTile extends ConsumerWidget {
           ),
         ],
       ),
+      onTap: delisted
+          ? null
+          : () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => DetailScreen(code: entry.code, name: name),
+              ),
+            ),
     );
   }
-}
-
-class _QuoteText extends StatelessWidget {
-  const _QuoteText({required this.quote});
-
-  final Quote quote;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.end,
-    children: [
-      Text('${quote.close}'),
-      Text(
-        '${quote.changeRate.toStringAsFixed(2)}%',
-        style: TextStyle(
-          fontSize: 12,
-          color: quote.isUp
-              ? Colors.red
-              : quote.isDown
-              ? Colors.blue
-              : Colors.grey,
-        ),
-      ),
-    ],
-  );
 }
