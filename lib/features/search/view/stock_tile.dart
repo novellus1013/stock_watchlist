@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stock_watchlist/features/detail/view/detail_screen.dart';
+import 'package:stock_watchlist/features/detail/view/quote_label.dart';
 import 'package:stock_watchlist/features/market/model/quote.dart';
 import 'package:stock_watchlist/features/market/model/stock.dart';
 import 'package:stock_watchlist/features/watchlist/vm/watchlist_view_model.dart';
@@ -28,25 +30,7 @@ class StockTile extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (q != null)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('${q.close}'),
-                Text(
-                  '${q.changeRate.toStringAsFixed(2)}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: q.isUp
-                        ? Colors.red
-                        : q.isDown
-                        ? Colors.blue
-                        : Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+          if (q != null) QuoteLabel(quote: q),
           IconButton(
             icon: Icon(starred ? Icons.star : Icons.star_border),
             color: starred ? Colors.amber : null,
@@ -55,6 +39,11 @@ class StockTile extends ConsumerWidget {
                 ref.read(watchlistViewModelProvider.notifier).toggle(stock),
           ),
         ],
+      ),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DetailScreen(code: stock.code, name: stock.name),
+        ),
       ),
     );
   }
