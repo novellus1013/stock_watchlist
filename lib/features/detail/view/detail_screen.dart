@@ -110,7 +110,11 @@ class DetailScreen extends ConsumerWidget {
               ),
               (final v?, _) => switch (v) {
                 QuoteAvailable(:final quote) => _Body(quote: quote),
-                QuoteUnavailable(:final reason) => _Unavailable(reason: reason),
+                QuoteUnavailable(:final reason, :final latestTradingDay) =>
+                  _Unavailable(
+                    reason: reason,
+                    latestTradingDay: latestTradingDay,
+                  ),
               },
             },
           ),
@@ -171,9 +175,10 @@ class _Row extends StatelessWidget {
 }
 
 class _Unavailable extends StatelessWidget {
-  const _Unavailable({required this.reason});
+  const _Unavailable({required this.reason, this.latestTradingDay});
 
   final UnavailableReason reason;
+  final String? latestTradingDay;
 
   @override
   Widget build(BuildContext context) => Center(
@@ -187,7 +192,7 @@ class _Unavailable extends StatelessWidget {
           Text(reason.label, style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 4),
           Text(
-            _hint(reason),
+            _hint(),
             style: const TextStyle(fontSize: 13, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
@@ -196,12 +201,22 @@ class _Unavailable extends StatelessWidget {
     ),
   );
 
-  String _hint(UnavailableReason r) => switch (r) {
-    UnavailableReason.nonTradingDay => '다른 날짜를 선택해 보세요.',
+  String _hint() => switch (reason) {
+    UnavailableReason.nonTradingDay =>
+      latestTradingDay == null
+          ? '다른 날짜를 선택해 보세요.'
+          : '최근 거래일은 ${_pretty(latestTradingDay!)}입니다.',
     UnavailableReason.beforeListing => '상장일 이후 날짜를 선택해 보세요.',
     UnavailableReason.delisted => '최근 거래일에 이 종목의 시세가 없습니다.',
+    UnavailableReason.unverifiable =>
+      '조회 가능한 기간을 벗어났습니다.\n최근 3개월 내 날짜를 선택해 보세요.',
     UnavailableReason.unknown => '다른 날짜를 선택해 보세요.',
   };
+
+  String _pretty(String yyyymmdd) =>
+      '${yyyymmdd.substring(0, 4)}-'
+      '${yyyymmdd.substring(4, 6)}-'
+      '${yyyymmdd.substring(6)}';
 }
 
 class _Error extends StatelessWidget {
