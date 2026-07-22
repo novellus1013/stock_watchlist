@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stock_watchlist/features/market/model/stock.dart';
 import 'package:stock_watchlist/features/market/provider/market_providers.dart';
-import 'package:stock_watchlist/features/search/index/linear_index.dart';
+import 'package:stock_watchlist/features/search/index/ngram_index.dart';
 import 'package:stock_watchlist/features/search/index/ranking.dart';
 import 'package:stock_watchlist/features/search/index/search_index.dart';
 
@@ -24,7 +24,7 @@ class SearchViewModel extends _$SearchViewModel {
 @Riverpod(keepAlive: true)
 Future<StockSearchIndex> searchIndex(Ref ref) async {
   final snap = await ref.watch(snapshotProvider.future);
-  return LinearSearchIndex(snap.stocks);
+  return NgramIndex(snap.stocks);
 }
 
 @riverpod
